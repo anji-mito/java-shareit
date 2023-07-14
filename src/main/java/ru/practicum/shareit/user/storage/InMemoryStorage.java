@@ -5,37 +5,38 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 public class InMemoryStorage {
     private final List<User> users = new ArrayList<>();
     private long counter = 0;
 
-    public User create(User user) {
+    public Optional<User> create(User user) {
         counter++;
         user.setId(counter);
         users.add(user);
-        return user;
+        return Optional.of(user);
     }
 
-    public User findById(long id) {
+    public Optional<User> findById(long id) {
         for (User user : users) {
             if (user.getId() == id) {
-                return user;
+                return Optional.of(user);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
-    public User update(User user) {
+    public Optional<Object> update(User user) {
         for (User foundUser : users) {
             if (user.getId() == foundUser.getId()) {
                 users.remove(user);
                 users.add(foundUser);
-                return foundUser;
+                return Optional.of(foundUser);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public List<User> findAll() {

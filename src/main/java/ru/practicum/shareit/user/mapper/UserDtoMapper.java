@@ -6,13 +6,20 @@ import ru.practicum.shareit.user.model.User;
 import java.util.function.Function;
 
 @Service
-public class UserDtoMapper  implements Function<User, UserDto> {
+public class UserDtoMapper implements Function<User, UserDto> {
     @Override
     public UserDto apply(User user) {
         return new UserDto(
                 user.getId(),
                 user.getName(),
                 user.getDescription()
+        );
+    }
+    public User reverse(UserDto userDto) {
+        return new User(
+                userDto.getId(),
+                userDto.getName(),
+                userDto.getDescription()
         );
     }
 }
