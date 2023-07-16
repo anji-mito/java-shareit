@@ -5,10 +5,11 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Component
-public class InMemoryStorage {
+public class InMemoryUserStorage {
     private final List<User> users = new ArrayList<>();
     private long counter = 0;
 
@@ -28,10 +29,11 @@ public class InMemoryStorage {
         return Optional.empty();
     }
 
-    public Optional<Object> update(User user) {
+    public Optional<User> update(User user) {
         for (User foundUser : users) {
             if (user.getId() == foundUser.getId()) {
-                users.remove(user);
+                users.remove(foundUser);
+                updateEntity(foundUser, user);
                 users.add(foundUser);
                 return Optional.of(foundUser);
             }
@@ -39,7 +41,28 @@ public class InMemoryStorage {
         return Optional.empty();
     }
 
+    private void updateEntity(User foundUser, User user) {
+        if (user.getName()!= null && !user.getName().isBlank()) {
+            foundUser.setName(user.getName());
+        }
+        if (user.getEmail()!= null && !user.getEmail().isBlank()) {
+            foundUser.setEmail(user.getEmail());
+        }
+    }
+
     public List<User> findAll() {
         return users;
+    }
+
+    public void deleteById(long id) {
+        users.removeIf(user -> user.getId() == id);
+    }
+    public Optional<User> getByEmail(String email) {
+        for (User user: users) {
+            if (Objects.equals(email, user.getEmail())) {
+                return Optional.of(user);
+            }
+        }
+        return Optional.empty();
     }
 }

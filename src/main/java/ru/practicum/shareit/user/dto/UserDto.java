@@ -1,14 +1,16 @@
 package ru.practicum.shareit.user.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
+
+//Стоит ли делать dto для каждого Entity?
+@Data
 public class UserDto {
     private long id;
     private String name;
-    private String description;
+    @NotNull
+    @Email
+    private String email;
 }

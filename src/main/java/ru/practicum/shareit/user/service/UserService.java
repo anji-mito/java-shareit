@@ -8,7 +8,7 @@ public interface UserService {
     UserDto add(UserDto userDto);
     void removeById(long id);
     UserDto getById(long id);
-    UserDto update(UserDto userDto);
+    UserDto update(UserDto userDto, long id);
 
     List<UserDto> getAll();
 }
