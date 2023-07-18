@@ -1,16 +1,16 @@
 package ru.practicum.shareit.item.service;
 
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemConverter;
 import ru.practicum.shareit.item.storage.InMemoryItemStorage;
 import ru.practicum.shareit.user.mapper.UserConverter;
 import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.user.storage.InMemoryUserStorage;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class ItemServiceImpl implements ItemService {
 
     private final InMemoryItemStorage itemStorage;
@@ -28,11 +28,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto add(ItemDto item, long userId) {
-        getById(item.getId());
         var owner = userService.getById(userId);
         var ownerEntity = userConverter.convertToEntity(owner);
-        itemStorage.add(itemConverter.convertToEntity(item, ownerEntity));
-        return item;
+        var addedItem = itemStorage.add(itemConverter.convertToEntity(item, ownerEntity));
+        return addedItem.map(itemConverter::convertToDto).orElseThrow();
     }
 
     @Override
@@ -47,8 +46,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto update(ItemDto item) {
-        return null;
+    public ItemDto update(ItemDto item, long userId) {
+        userService.getById(userId);
+        itemStorage.update(itemConverter.convertToEntity(item));
+        return item;
     }
 
     @Override

@@ -10,10 +10,11 @@ public class InMemoryItemStorage {
     private final Map<Long, Item> items = new HashMap<>();
     long count = 0;
 
-    public void add(Item item) {
+    public Optional<Item> add(Item item) {
         count++;
         item.setId(count);
         items.put(item.getId(), item);
+        return Optional.of(item);
     }
 
     public Optional<Item> getById(long id) {
