@@ -4,8 +4,10 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemConverter;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.storage.InMemoryItemStorage;
 import ru.practicum.shareit.user.mapper.UserConverter;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,27 +35,41 @@ public class ItemServiceImpl implements ItemService {
         var addedItem = itemStorage.add(itemConverter.convertToEntity(item, ownerEntity));
         return addedItem.map(itemConverter::convertToDto).orElseThrow();
     }
-
     @Override
-    public List<ItemDto> getAll() {
-        return itemStorage.getAll().stream().map(itemConverter::convertToDto).collect(Collectors.toList());
+    public List<ItemDto> getAll(long userId) {
+        return itemStorage.getAll(userConverter.convertToEntity(userService.getById(userId))).stream()
+                .map(itemConverter::convertToDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public ItemDto getById(Long id) {
-        return itemStorage.getById(id).map(itemConverter::convertToDto)
-                .orElseThrow(() -> new NotFoundException("Item not found"));
+        var foundItem = itemStorage.getById(id);
+        if(foundItem.isPresent()) {
+            return itemConverter.convertToDto(foundItem.get());
+        } else {
+            throw new NotFoundException("Item not found");
+        }
     }
 
     @Override
-    public ItemDto update(ItemDto item, long userId) {
+    public ItemDto update(ItemDto item, long userId, long itemId) {
         userService.getById(userId);
-        itemStorage.update(itemConverter.convertToEntity(item));
-        return item;
+        getById(itemId);
+        item.setId(itemId);
+        Item convertedItem = itemConverter.convertToEntity(item);
+        if(getOwner(convertedItem).getId() == userId) {
+            return itemStorage.update(convertedItem).map(itemConverter::convertToDto).orElseThrow();
+        }
+        throw new NotFoundException("User is not owner of item");
     }
 
+    private User getOwner(Item item) {
+        return itemStorage.getOwnerOfItem(item);
+    }
     @Override
     public void delete(Long id) {
         itemStorage.deleteById(id);
     }
+
 }
