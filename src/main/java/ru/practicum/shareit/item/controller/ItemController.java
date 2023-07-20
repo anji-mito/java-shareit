@@ -43,4 +43,14 @@ public class ItemController {
         itemService.delete(id);
     }
 
+    @GetMapping("/search")
+    public List<ItemDto> search(@RequestParam(required = false) String text,
+            @RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.search(text, userId);
+    }
+
+    @GetMapping("/search/{text}")
+    public List<ItemDto> searchIt(@PathVariable String text) {
+        return itemService.search(text);
+    }
 }

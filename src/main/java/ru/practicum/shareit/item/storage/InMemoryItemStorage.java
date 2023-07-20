@@ -71,10 +71,23 @@ public class InMemoryItemStorage {
         }
     }
 
-    public List<Item> searchByName(String name) {
+    public List<Item> searchByName(String name, User user) {
         List<Item> foundItems = new ArrayList<>();
         for (Item item : items.values()) {
-            if(item.getName().equalsIgnoreCase(name) || item.getDescription().equalsIgnoreCase(name)) {
+            if(item.getName().toLowerCase().contains(name.toLowerCase())
+                    || item.getDescription().toLowerCase().contains(name.toLowerCase())
+                    && user.getId() == item.getOwner().getId()) {
+                foundItems.add(item);
+            }
+        }
+        return foundItems;
+    }
+
+    public List<Item> searchByName(String text) {
+        List<Item> foundItems = new ArrayList<>();
+        for (Item item : items.values()) {
+            if(item.getName().toLowerCase().contains(text.toLowerCase())
+                    || item.getDescription().toLowerCase().contains(text.toLowerCase())) {
                 foundItems.add(item);
             }
         }

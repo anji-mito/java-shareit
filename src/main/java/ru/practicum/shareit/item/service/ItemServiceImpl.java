@@ -73,9 +73,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String searchQuery) {
-        return itemStorage.searchByName(searchQuery).stream()
+    public List<ItemDto> search(String searchQuery, long userId) {
+        if (searchQuery == null || searchQuery.isEmpty()) {
+            return List.of();
+        }
+        if (userId == 0) {
+            return itemStorage.searchByName(searchQuery).stream()
+                    .map(itemConverter::convertToDto)
+                    .collect(Collectors.toList());
+        }
+        return itemStorage.searchByName(searchQuery, userConverter.convertToEntity(userService.getById(userId))).stream()
                 .map(itemConverter::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ItemDto> search(String text) {
+        return null;
     }
 }
