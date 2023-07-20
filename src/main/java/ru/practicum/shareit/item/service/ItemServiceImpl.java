@@ -72,4 +72,10 @@ public class ItemServiceImpl implements ItemService {
         itemStorage.deleteById(id);
     }
 
+    @Override
+    public List<ItemDto> search(String searchQuery) {
+        return itemStorage.searchByName(searchQuery).stream()
+                .map(itemConverter::convertToDto)
+                .collect(Collectors.toList());
+    }
 }

@@ -12,4 +12,5 @@ public interface ItemService {
     ItemDto getById(Long id);
     ItemDto update(ItemDto item, long userId, long itemId);
     void delete(Long id);
+    List<ItemDto> search(String searchQuery);
 }

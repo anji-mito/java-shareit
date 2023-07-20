@@ -62,10 +62,6 @@ public class InMemoryItemStorage {
         }
     }
 
-    public Item searchByName(String name) {
-        return items.values().stream().filter(item -> item.getName().equals(name)).findFirst().orElse(null);
-    }
-
     public User getOwnerOfItem(Item item) {
         Item foudndItem = items.get(item.getId());
         if(foudndItem == null) {
@@ -73,5 +69,15 @@ public class InMemoryItemStorage {
         } else {
             return foudndItem.getOwner();
         }
+    }
+
+    public List<Item> searchByName(String name) {
+        List<Item> foundItems = new ArrayList<>();
+        for (Item item : items.values()) {
+            if(item.getName().equalsIgnoreCase(name) || item.getDescription().equalsIgnoreCase(name)) {
+                foundItems.add(item);
+            }
+        }
+        return foundItems;
     }
 }
