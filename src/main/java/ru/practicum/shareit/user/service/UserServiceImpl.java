@@ -6,6 +6,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserConverter;
 import ru.practicum.shareit.user.storage.InMemoryUserStorage;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,13 +28,6 @@ public class UserServiceImpl implements UserService {
         return user.map(userConverter::convertToDto).get();
     }
 
-    private void checkIfEmailExist(UserDto userDto) {
-        var existingUser = inMemoryUserStorage.getByEmail(userDto.getEmail());
-        if (existingUser.isPresent()) {
-            throw new AlreadyExistsException("Email уже существует: " + userDto.getEmail());
-        }
-    }
-
     @Override
     public void removeById(long id) {
         getById(id);
@@ -45,6 +39,7 @@ public class UserServiceImpl implements UserService {
         return inMemoryUserStorage.findById(id).map(userConverter::convertToDto)
                 .orElseThrow(() -> new NotFoundException("Пользователь не был найден"));
     }
+
     @Override
     public UserDto update(UserDto userDto, long id) {
         inMemoryUserStorage.getByEmail(userDto.getEmail())
@@ -57,8 +52,18 @@ public class UserServiceImpl implements UserService {
         return updatedUser.map(userConverter::convertToDto)
                 .orElseThrow(() -> new NotFoundException("Пользователь с указанным id не найден"));
     }
+
     @Override
     public List<UserDto> getAll() {
-        return inMemoryUserStorage.findAll().stream().map(userConverter::convertToDto).collect(Collectors.toList());
+        return inMemoryUserStorage.findAll().stream()
+                .map(userConverter::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    private void checkIfEmailExist(UserDto userDto) {
+        var existingUser = inMemoryUserStorage.getByEmail(userDto.getEmail());
+        if (existingUser.isPresent()) {
+            throw new AlreadyExistsException("Email уже существует: " + userDto.getEmail());
+        }
     }
 }

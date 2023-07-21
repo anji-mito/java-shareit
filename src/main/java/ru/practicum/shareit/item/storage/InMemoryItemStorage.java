@@ -21,7 +21,7 @@ public class InMemoryItemStorage {
 
     public Optional<Item> getById(long id) {
         Item item = items.get(id);
-        if(item == null) {
+        if (item == null) {
             return Optional.empty();
         }
         return Optional.of(items.get(id));
@@ -43,54 +43,39 @@ public class InMemoryItemStorage {
         return Optional.of(item);
     }
 
+    public User getOwnerOfItem(Item item) {
+        Item foudndItem = items.get(item.getId());
+        return foudndItem.getOwner();
+    }
+
+    public List<Item> search(String text) {
+        List<Item> foundItems = new ArrayList<>();
+        for (Item item : items.values()) {
+            if (item.getName().toLowerCase().contains(text.toLowerCase())
+                    || item.getDescription().toLowerCase().contains(text.toLowerCase())
+                    && item.getAvailable()) {
+                foundItems.add(item);
+            }
+        }
+        return foundItems;
+    }
+
     private Item patchItem(Item item) {
         Optional<Item> itemToUpdateOpt = getById(item.getId());
-        if(itemToUpdateOpt.isPresent()) {
+        if (itemToUpdateOpt.isPresent()) {
             Item itemToUpdate = itemToUpdateOpt.get();
-            if(item.getName()!= null) {
+            if (item.getName() != null) {
                 itemToUpdate.setName(item.getName());
             }
-            if(item.getDescription()!= null) {
+            if (item.getDescription() != null) {
                 itemToUpdate.setDescription(item.getDescription());
             }
-            if(item.getAvailable() != null) {
+            if (item.getAvailable() != null) {
                 itemToUpdate.setAvailable(item.getAvailable());
             }
             return itemToUpdate;
         } else {
             return item;
         }
-    }
-
-    public User getOwnerOfItem(Item item) {
-        Item foudndItem = items.get(item.getId());
-        if(foudndItem == null) {
-            return null;
-        } else {
-            return foudndItem.getOwner();
-        }
-    }
-
-    public List<Item> searchByName(String name, User user) {
-        List<Item> foundItems = new ArrayList<>();
-        for (Item item : items.values()) {
-            if(item.getName().toLowerCase().contains(name.toLowerCase())
-                    || item.getDescription().toLowerCase().contains(name.toLowerCase())
-                    && user.getId() == item.getOwner().getId()) {
-                foundItems.add(item);
-            }
-        }
-        return foundItems;
-    }
-
-    public List<Item> searchByName(String text) {
-        List<Item> foundItems = new ArrayList<>();
-        for (Item item : items.values()) {
-            if(item.getName().toLowerCase().contains(text.toLowerCase())
-                    || item.getDescription().toLowerCase().contains(text.toLowerCase())) {
-                foundItems.add(item);
-            }
-        }
-        return foundItems;
     }
 }

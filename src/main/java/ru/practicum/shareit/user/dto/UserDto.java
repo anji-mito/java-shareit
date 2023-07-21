@@ -5,6 +5,7 @@ import lombok.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 
+//TODO questions:
 //Стоит ли делать dto для каждого Entity?
 @Data
 public class UserDto {

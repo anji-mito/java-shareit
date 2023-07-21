@@ -17,6 +17,7 @@ public class ItemConverter {
     public ItemDto convertToDto(Item item) {
         return modelMapper.map(item, ItemDto.class);
     }
+
     public Item convertToEntity(ItemDto itemDto) {
         return modelMapper.map(itemDto, Item.class);
     }

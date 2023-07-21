@@ -42,10 +42,10 @@ public class InMemoryUserStorage {
     }
 
     private void updateEntity(User foundUser, User user) {
-        if (user.getName()!= null && !user.getName().isBlank()) {
+        if (user.getName() != null && !user.getName().isBlank()) {
             foundUser.setName(user.getName());
         }
-        if (user.getEmail()!= null && !user.getEmail().isBlank()) {
+        if (user.getEmail() != null && !user.getEmail().isBlank()) {
             foundUser.setEmail(user.getEmail());
         }
     }
@@ -57,8 +57,9 @@ public class InMemoryUserStorage {
     public void deleteById(long id) {
         users.removeIf(user -> user.getId() == id);
     }
+
     public Optional<User> getByEmail(String email) {
-        for (User user: users) {
+        for (User user : users) {
             if (Objects.equals(email, user.getEmail())) {
                 return Optional.of(user);
             }
