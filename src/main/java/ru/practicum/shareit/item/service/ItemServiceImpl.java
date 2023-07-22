@@ -60,7 +60,7 @@ public class ItemServiceImpl implements ItemService {
         if (getOwner(convertedItem).getId() == userId) {
             return itemStorage.update(convertedItem)
                     .map(itemConverter::convertToDto)
-                    .orElseThrow(() -> new ConflictException("Item is not updated " + item + ", userId: "+ userId));
+                    .orElseThrow(() -> new ConflictException("Item is not updated " + item + ", userId: " + userId));
         }
         throw new NotFoundException("User is not owner of the item");
     }
