@@ -44,20 +44,20 @@ public class InMemoryItemStorage {
     }
 
     public User getOwnerOfItem(Item item) {
-        Item foudndItem = items.get(item.getId());
-        return foudndItem.getOwner();
+        return items.get(item.getId())
+                .getOwner();
     }
 
     public List<Item> search(String text) {
-        List<Item> foundItems = new ArrayList<>();
-        for (Item item : items.values()) {
-            if (item.getName().toLowerCase().contains(text.toLowerCase())
-                    || item.getDescription().toLowerCase().contains(text.toLowerCase())
-                    && item.getAvailable()) {
-                foundItems.add(item);
-            }
-        }
-        return foundItems;
+        return items.values().stream()
+                .filter(item -> isItemMatchingSearchQuery(text, item))
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    private boolean isItemMatchingSearchQuery(String text, Item item) {
+        return item.getName().toLowerCase().contains(text.toLowerCase())
+                || item.getDescription().toLowerCase().contains(text.toLowerCase())
+                && item.getAvailable();
     }
 
     private Item patchItem(Item item) {
@@ -74,8 +74,7 @@ public class InMemoryItemStorage {
                 itemToUpdate.setAvailable(item.getAvailable());
             }
             return itemToUpdate;
-        } else {
-            return item;
         }
+        return item;
     }
 }

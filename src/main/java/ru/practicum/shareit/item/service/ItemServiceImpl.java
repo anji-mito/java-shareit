@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemConverter;
@@ -40,17 +41,14 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getAll(long userId) {
         return itemStorage.getAll(userConverter.convertToEntity(userService.getById(userId))).stream()
                 .map(itemConverter::convertToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toUnmodifiableList());
     }
 
     @Override
     public ItemDto getById(Long id) {
-        var foundItem = itemStorage.getById(id);
-        if (foundItem.isPresent()) {
-            return itemConverter.convertToDto(foundItem.get());
-        } else {
-            throw new NotFoundException("Item not found");
-        }
+        return itemStorage.getById(id)
+                .map(itemConverter::convertToDto)
+                .orElseThrow(() -> new NotFoundException("Not found item by id: " + id));
     }
 
     @Override
@@ -60,7 +58,9 @@ public class ItemServiceImpl implements ItemService {
         item.setId(itemId);
         Item convertedItem = itemConverter.convertToEntity(item);
         if (getOwner(convertedItem).getId() == userId) {
-            return itemStorage.update(convertedItem).map(itemConverter::convertToDto).orElseThrow();
+            return itemStorage.update(convertedItem)
+                    .map(itemConverter::convertToDto)
+                    .orElseThrow(() -> new ConflictException("Item is not updated " + item + ", userId: "+ userId));
         }
         throw new NotFoundException("User is not owner of the item");
     }
@@ -74,11 +74,10 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> search(String searchQuery) {
         if (searchQuery == null || searchQuery.isEmpty()) {
             return List.of();
-        } else {
-            return itemStorage.search(searchQuery).stream()
-                    .map(itemConverter::convertToDto)
-                    .collect(Collectors.toList());
         }
+        return itemStorage.search(searchQuery).stream()
+                .map(itemConverter::convertToDto)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     private User getOwner(Item item) {

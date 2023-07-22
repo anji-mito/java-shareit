@@ -1,7 +1,7 @@
 package ru.practicum.shareit.user.service;
 
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.AlreadyExistsException;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserConverter;
@@ -25,7 +25,8 @@ public class UserServiceImpl implements UserService {
     public UserDto add(UserDto userDto) {
         checkIfEmailExist(userDto);
         var user = inMemoryUserStorage.create(userConverter.convertToEntity(userDto));
-        return user.map(userConverter::convertToDto).get();
+        return user.map(userConverter::convertToDto)
+                .orElseThrow(() -> new ConflictException("Could not add user"));
     }
 
     @Override
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
         inMemoryUserStorage.getByEmail(userDto.getEmail())
                 .filter(existingUser -> existingUser.getId() != id)
                 .ifPresent(existingUser -> {
-                    throw new AlreadyExistsException("Эта почта занята другим пользователем");
+                    throw new ConflictException("Эта почта занята другим пользователем");
                 });
         userDto.setId(id);
         var updatedUser = inMemoryUserStorage.update(userConverter.convertToEntity(userDto));
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService {
     private void checkIfEmailExist(UserDto userDto) {
         var existingUser = inMemoryUserStorage.getByEmail(userDto.getEmail());
         if (existingUser.isPresent()) {
-            throw new AlreadyExistsException("Email уже существует: " + userDto.getEmail());
+            throw new ConflictException("Email уже существует: " + userDto.getEmail());
         }
     }
 }

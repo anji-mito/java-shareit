@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -12,8 +11,11 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemController {
 
-    @Autowired
-    private ItemService itemService;
+    private final ItemService itemService;
+
+    public ItemController(ItemService itemService) {
+        this.itemService = itemService;
+    }
 
     @GetMapping
     public List<ItemDto> getAllByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
@@ -21,8 +23,7 @@ public class ItemController {
     }
 
     @GetMapping("/{id}")
-    public ItemDto getById(@PathVariable long id,
-            @RequestHeader("X-Sharer-User-Id") long userId) {
+    public ItemDto getById(@PathVariable long id) {
         return itemService.getById(id);
     }
 
