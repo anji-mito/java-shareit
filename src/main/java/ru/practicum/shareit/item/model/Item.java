@@ -16,15 +16,11 @@ import javax.persistence.Table;
 @Builder
 @Data
 @NoArgsConstructor
-@Entity
-@Table(name = "items")
 public class Item {
-    @Id
     private long id;
     private String name;
     private String description;
     private Boolean available;
-    @Column(name = "owner_id", nullable=false)
     private User owner;
     private ItemRequest request;
 }
