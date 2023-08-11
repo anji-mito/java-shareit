@@ -10,7 +10,7 @@ logging:
 spring:
   config:
     activate:
-      on-profile: ci,test
+      on-profile: test
   datasource:
     driverClassName: org.h2.Driver
     password: test
