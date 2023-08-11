@@ -33,10 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void removeById(long id) {
-        boolean exists = userRepository.existsById(id);
-        if (!exists) {
-            throw new NotFoundException("user with id + " + id + " does not exist");
-        }
+
         userRepository.deleteById(id);
     }
 
