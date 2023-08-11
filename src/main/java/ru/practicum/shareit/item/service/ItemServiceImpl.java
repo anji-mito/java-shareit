@@ -74,11 +74,11 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Not found item by id: " + id);
         }
         if (foundItem.get().getOwner().getId() == userId) {
-            var lastBooking = bookingRepository.
-                    findFirstByItemIdAndStartIsBeforeAndItemOwnerIdAndStatusOrderByStartDesc(id, LocalDateTime.now(),
+            var lastBooking = bookingRepository
+                    .findFirstByItemIdAndStartIsBeforeAndItemOwnerIdAndStatusOrderByStartDesc(id, LocalDateTime.now(),
                             userId, Status.APPROVED);
-            var nextBooking = bookingRepository.
-                    findFirstByItemIdAndStartIsAfterAndItemOwnerIdAndStatusOrderByStartAsc(id, LocalDateTime.now(),
+            var nextBooking = bookingRepository
+                    .findFirstByItemIdAndStartIsAfterAndItemOwnerIdAndStatusOrderByStartAsc(id, LocalDateTime.now(),
                             userId, Status.APPROVED);
             var comments = commentRepository.findAllByItemId(id);
             return itemConverter.convertToDto(foundItem.get(), bookerForItemConverter.convertToDto(lastBooking),
