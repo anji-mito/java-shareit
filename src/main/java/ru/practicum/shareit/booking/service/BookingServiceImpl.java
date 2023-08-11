@@ -56,7 +56,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto approveBooking(boolean isApproved, long bookingId, long userId) {
-        var user = userService.getById(userId);
+        userService.getById(userId);
         var booking = bookingRepository.findById(bookingId);
         if (booking.isPresent()) {
             if (booking.get().getItem().getOwner().getId() == userId) {
@@ -99,35 +99,34 @@ public class BookingServiceImpl implements BookingService {
         userService.getById(userId);
         switch (state) {
             case "ALL":
-                return bookingRepository.findAllByBookerIdOrderByStartDesc(userId).stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                return bookingRepository.findAllByBookerIdOrderByStartDesc(userId).stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "CURRENT":
                 return bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId,
-                                LocalDateTime.now(), LocalDateTime.now()).
-                        stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                                LocalDateTime.now(), LocalDateTime.now()).stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "PAST":
-                return bookingRepository.findAllByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now()).
-                        stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                return bookingRepository.findAllByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now())
+                        .stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "FUTURE":
-                return bookingRepository.findAllByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now()).
-                        stream().
-                        map(bookingConverter::convertToDto).
+                return bookingRepository.findAllByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now())
+                        .stream()
+                        .map(bookingConverter::convertToDto).
                         collect(Collectors.toUnmodifiableList());
             case "WAITING":
-                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING).
-                        stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING)
+                        .stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "REJECTED":
-                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED).
-                        stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED)
+                        .stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             default: throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
@@ -137,37 +136,33 @@ public class BookingServiceImpl implements BookingService {
         userService.getById(ownerId);
         switch (state) {
             case "ALL":
-                return bookingRepository.findAllByItemOwnerIdOrderByStartDesc(ownerId).stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                return bookingRepository.findAllByItemOwnerIdOrderByStartDesc(ownerId).stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "CURRENT":
                 return bookingRepository.findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(ownerId,
-                                LocalDateTime.now(), LocalDateTime.now()).
-                        stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                                LocalDateTime.now(), LocalDateTime.now()).stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "PAST":
                 return bookingRepository.findAllByItemOwnerIdAndEndIsBeforeOrderByStartDesc(ownerId,
-                                LocalDateTime.now()).
-                        stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                                LocalDateTime.now()).stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "FUTURE":
                 return bookingRepository.findAllByItemOwnerIdAndStartIsAfterOrderByStartDesc(ownerId,
-                                LocalDateTime.now()).
-                        stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                                LocalDateTime.now()).stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "WAITING":
-                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, Status.WAITING).
-                        stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, Status.WAITING).stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "REJECTED":
-                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, Status.REJECTED).
-                        stream().
-                        map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                return bookingRepository.findAllByItemOwnerIdAndStatusOrderByStartDesc(ownerId, Status.REJECTED)
+                        .stream()
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             default: throw new BadRequestException("Unknown state: UNSUPPORTED_STATUS");
         }
     }
