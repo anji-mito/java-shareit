@@ -26,12 +26,24 @@ public class Item {
     private String description;
     private Boolean available;
     @ManyToOne
-    @JoinColumn(name="user_id", nullable=false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User owner;
     @OneToMany(mappedBy = "item", fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
     private Collection<Booking> bookings = new ArrayList<>();
     private long request;
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        result = 31 * result + (available != null ? available.hashCode() : 0);
+        result = 31 * result + (owner != null ? owner.hashCode() : 0);
+        result = 31 * result + (bookings != null ? bookings.hashCode() : 0);
+        result = 31 * result + (int) (request ^ (request >>> 32));
+        return result;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -47,17 +59,5 @@ public class Item {
         if (!Objects.equals(available, item.available)) return false;
         if (!Objects.equals(owner, item.owner)) return false;
         return Objects.equals(bookings, item.bookings);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (available != null ? available.hashCode() : 0);
-        result = 31 * result + (owner != null ? owner.hashCode() : 0);
-        result = 31 * result + (bookings != null ? bookings.hashCode() : 0);
-        result = 31 * result + (int) (request ^ (request >>> 32));
-        return result;
     }
 }

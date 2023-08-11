@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.booking.model.Booking;
+
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -25,6 +26,7 @@ public class ItemConverter {
     public ItemDto convertToDto(Item item) {
         return modelMapper.map(item, ItemDto.class);
     }
+
     public ItemDto convertToDto(Item item, List<CommentDto> comments) {
         var mappedItem = modelMapper.map(item, ItemDto.class);
         mappedItem.setComments(comments);
@@ -45,9 +47,6 @@ public class ItemConverter {
         mappedItem.setOwner(owner);
         return mappedItem;
     }
-    public Item convertToEntity(ItemDto itemDto) {
-        return modelMapper.map(itemDto, Item.class);
-    }
 
     public ItemDto convertToDtoWithBookings(Item item) {
         BookerForItemConverter converter = new BookerForItemConverter();
@@ -56,14 +55,14 @@ public class ItemConverter {
                 .filter(booking -> booking.getEnd().isBefore(LocalDateTime.now()))
                 .filter(booking -> booking.getStatus() == Status.APPROVED)
                 .findFirst();
-        if(lastBooking.isPresent()) {
+        if (lastBooking.isPresent()) {
             mappedItemDto.setLastBooking(converter.convertToDto(lastBooking));
         }
         var nextBooking = item.getBookings().stream()
                 .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
                 .filter(booking -> booking.getStatus() == Status.APPROVED)
                 .min(Comparator.comparing(Booking::getStart));
-        if(nextBooking.isPresent()) {
+        if (nextBooking.isPresent()) {
             mappedItemDto.setNextBooking(converter.convertToDto(nextBooking));
         }
         return mappedItemDto;

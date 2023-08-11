@@ -115,8 +115,8 @@ public class BookingServiceImpl implements BookingService {
             case "FUTURE":
                 return bookingRepository.findAllByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now())
                         .stream()
-                        .map(bookingConverter::convertToDto).
-                        collect(Collectors.toUnmodifiableList());
+                        .map(bookingConverter::convertToDto)
+                        .collect(Collectors.toUnmodifiableList());
             case "WAITING":
                 return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING)
                         .stream()
