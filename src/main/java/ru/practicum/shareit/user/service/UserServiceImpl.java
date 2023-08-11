@@ -8,7 +8,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserConverter;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.storage.InMemoryUserStorage;
 
 import javax.transaction.Transactional;
 import java.util.List;
@@ -21,15 +20,15 @@ public class UserServiceImpl implements UserService {
     private final UserConverter userConverter;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, InMemoryUserStorage inMemoryUserStorage) {
+    public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.userConverter = new UserConverter();
     }
 
     @Override
     public UserDto add(UserDto userDto) {
-        checkIfEmailExist(userDto);
-        return userConverter.convertToDto(userRepository.save(userConverter.convertToEntity(userDto)));
+        User user = userRepository.save(userConverter.convertToEntity(userDto));
+        return userConverter.convertToDto(user);
     }
 
     @Override
@@ -60,7 +59,7 @@ public class UserServiceImpl implements UserService {
         }
         if (email != null && email.length() > 0 && !Objects.equals(email, user.getEmail())) {
             var userByEmail = userRepository.findUserByEmail(email);
-            if(userByEmail.isPresent()) {
+            if (userByEmail.isPresent()) {
                 throw new ConflictException("This email: " + email + " is already in use");
             }
             user.setEmail(email);
@@ -76,10 +75,4 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    private void checkIfEmailExist(UserDto userDto) {
-        var userByEmail = userRepository.findUserByEmail(userDto.getEmail());
-        if (userByEmail.isPresent()) {
-            throw new ConflictException("Email уже существует: " + userDto.getEmail());
-        }
-    }
 }
