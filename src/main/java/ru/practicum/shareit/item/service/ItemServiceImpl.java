@@ -157,6 +157,10 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private User getOwner(Long id) {
-        return itemRepository.findById(id).get().getOwner();
+        var item = itemRepository.findById(id);
+        if (item.isPresent()) {
+            return item.get().getOwner();
+        }
+        throw new NotFoundException("Item with id " + id + " does not exist");
     }
 }
