@@ -9,8 +9,9 @@ import ru.practicum.shareit.user.model.User;
 public class UserConverter {
     private final ModelMapper modelMapper;
 
-    public UserConverter() {
-        this.modelMapper = new ModelMapper();
+    public UserConverter(ModelMapper modelMapper) {
+
+        this.modelMapper = modelMapper;
     }
 
     public UserDto convertToDto(User user) {

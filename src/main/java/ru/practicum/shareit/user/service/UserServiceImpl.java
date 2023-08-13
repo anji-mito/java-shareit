@@ -1,70 +1,77 @@
 package ru.practicum.shareit.user.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserConverter;
-import ru.practicum.shareit.user.storage.InMemoryUserStorage;
+import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
+    private final UserRepository userRepository;
+    private final UserConverter userConverter;
 
-    final UserConverter userConverter;
-    final InMemoryUserStorage inMemoryUserStorage;
-
-    public UserServiceImpl(InMemoryUserStorage inMemoryUserStorage) {
-        this.userConverter = new UserConverter();
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, UserConverter userConverter) {
+        this.userRepository = userRepository;
+        this.userConverter = userConverter;
     }
 
     @Override
     public UserDto add(UserDto userDto) {
-        checkIfEmailExist(userDto);
-        var user = inMemoryUserStorage.create(userConverter.convertToEntity(userDto));
-        return user.map(userConverter::convertToDto)
-                .orElseThrow(() -> new ConflictException("Could not add user"));
+        User user = userRepository.save(userConverter.convertToEntity(userDto));
+        return userConverter.convertToDto(user);
     }
 
     @Override
     public void removeById(long id) {
-        getById(id);
-        inMemoryUserStorage.deleteById(id);
+        boolean exists = userRepository.existsById(id);
+        if (!exists) {
+            throw new NotFoundException("user with id + " + id + " does not exist");
+        }
+        userRepository.deleteById(id);
     }
 
     @Override
     public UserDto getById(long id) {
-        return inMemoryUserStorage.findById(id).map(userConverter::convertToDto)
+        return userRepository.findById(id).map(userConverter::convertToDto)
                 .orElseThrow(() -> new NotFoundException("Пользователь не был найден"));
     }
 
     @Override
+    @Transactional
     public UserDto update(UserDto userDto, long id) {
-        inMemoryUserStorage.getByEmail(userDto.getEmail())
-                .filter(existingUser -> existingUser.getId() != id)
-                .ifPresent(existingUser -> {
-                    throw new ConflictException("Эта почта занята другим пользователем");
-                });
+        String name = userDto.getName();
+        String email = userDto.getEmail();
         userDto.setId(id);
-        var updatedUser = inMemoryUserStorage.update(userConverter.convertToEntity(userDto));
-        return updatedUser.map(userConverter::convertToDto)
-                .orElseThrow(() -> new NotFoundException("Пользователь с указанным id не найден"));
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("user with id + " + id + " does not exist"));
+        if (name != null && name.length() > 0 && !Objects.equals(name, user.getName())) {
+            user.setName(name);
+        }
+        if (email != null && email.length() > 0 && !Objects.equals(email, user.getEmail())) {
+            var userByEmail = userRepository.findUserByEmail(email);
+            if (userByEmail.isPresent()) {
+                throw new ConflictException("This email: " + email + " is already in use");
+            }
+            user.setEmail(email);
+        }
+        return userConverter.convertToDto(user);
     }
 
     @Override
     public List<UserDto> getAll() {
-        return inMemoryUserStorage.findAll().stream()
+        return userRepository.findAll().stream()
                 .map(userConverter::convertToDto)
-                .collect(Collectors.toList());
+                .collect(Collectors.toUnmodifiableList());
     }
 
-    private void checkIfEmailExist(UserDto userDto) {
-        var existingUser = inMemoryUserStorage.getByEmail(userDto.getEmail());
-        if (existingUser.isPresent()) {
-            throw new ConflictException("Email уже существует: " + userDto.getEmail());
-        }
-    }
 }
