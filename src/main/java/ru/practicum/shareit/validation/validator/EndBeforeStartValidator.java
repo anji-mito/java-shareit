@@ -16,9 +16,6 @@ public class EndBeforeStartValidator implements ConstraintValidator<EndBeforeSta
         if (bookingCreationDto.getEnd().isBefore(bookingCreationDto.getStart())) {
             return false;
         }
-        if (bookingCreationDto.getEnd().equals(bookingCreationDto.getStart())) {
-            return false;
-        }
-        return true;
+        return !bookingCreationDto.getEnd().equals(bookingCreationDto.getStart());
     }
 }

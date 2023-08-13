@@ -15,8 +15,8 @@ import ru.practicum.shareit.user.model.User;
 public class BookingConverter {
     private final ModelMapper modelMapper;
 
-    public BookingConverter() {
-        this.modelMapper = new ModelMapper();
+    public BookingConverter(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
     }
 
     public BookingDto convertToDto(Booking booking) {

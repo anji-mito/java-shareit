@@ -28,9 +28,12 @@ public class Item {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
-    @OneToMany(mappedBy = "item", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
     @Fetch(value = FetchMode.SUBSELECT)
     private Collection<Booking> bookings = new ArrayList<>();
+    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
+    @Fetch(value = FetchMode.SUBSELECT)
+    private Collection<Comment> comments = new ArrayList<>();
     private long request;
 
     @Override

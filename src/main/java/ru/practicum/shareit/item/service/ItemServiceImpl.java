@@ -14,7 +14,6 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.item.mapper.BookerForItemConverter;
 import ru.practicum.shareit.user.mapper.UserConverter;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -32,21 +31,21 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final UserConverter userConverter;
     private final ItemRepository itemRepository;
-    private final BookerForItemConverter bookerForItemConverter;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
     private final CommentConverter commentConverter;
 
-    public ItemServiceImpl(UserService userService, ItemRepository itemRepository,
+    public ItemServiceImpl(ItemConverter itemConverter, UserService userService, UserConverter userConverter,
+            ItemRepository itemRepository,
             BookingRepository bookingRepository, CommentRepository commentRepository) {
+        this.itemConverter = itemConverter;
         this.userService = userService;
+        this.userConverter = userConverter;
         this.itemRepository = itemRepository;
         this.commentRepository = commentRepository;
         this.commentConverter = new CommentConverter();
-        this.bookerForItemConverter = new BookerForItemConverter();
         this.bookingRepository = bookingRepository;
-        this.userConverter = new UserConverter();
-        this.itemConverter = new ItemConverter();
+
     }
 
     @Override
@@ -60,7 +59,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public List<ItemDto> getAll(long userId) {
-        var user = userService.getById(userId);
+        userService.getById(userId);
         return itemRepository.findAllByOwnerId(userId)
                 .stream()
                 .map(itemConverter::convertToDtoWithBookings)
@@ -74,16 +73,7 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException("Not found item by id: " + id);
         }
         if (foundItem.get().getOwner().getId() == userId) {
-            var lastBooking = bookingRepository
-                    .findFirstByItemIdAndStartIsBeforeAndItemOwnerIdAndStatusOrderByStartDesc(id, LocalDateTime.now(),
-                            userId, Status.APPROVED);
-            var nextBooking = bookingRepository
-                    .findFirstByItemIdAndStartIsAfterAndItemOwnerIdAndStatusOrderByStartAsc(id, LocalDateTime.now(),
-                            userId, Status.APPROVED);
-            var comments = commentRepository.findAllByItemId(id);
-            return itemConverter.convertToDto(foundItem.get(), bookerForItemConverter.convertToDto(lastBooking),
-                    bookerForItemConverter.convertToDto(nextBooking),
-                    comments.stream().map(commentConverter::convertToDto).collect(Collectors.toUnmodifiableList()));
+            return itemConverter.convertToDtoWithBookings(foundItem.get());
         } else {
             var comments = commentRepository.findAllByItemId(id);
             var commentsDto = comments.stream()
@@ -131,7 +121,7 @@ public class ItemServiceImpl implements ItemService {
         if (searchQuery == null || searchQuery.isEmpty()) {
             return List.of();
         }
-        return itemRepository.findByNameAndDescriptionContainingIgnoreCase(searchQuery).stream()
+        return itemRepository.searchAvailableItemsByNameAndDescription(searchQuery).stream()
                 .map(itemConverter::convertToDto)
                 .collect(Collectors.toUnmodifiableList());
     }
@@ -157,10 +147,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private User getOwner(Long id) {
-        var item = itemRepository.findById(id);
-        if (item.isPresent()) {
-            return item.get().getOwner();
-        }
-        throw new NotFoundException("Item with id " + id + " does not exist");
+        var item = itemRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Item with id " + id + " does not exist"));
+        return item.getOwner();
     }
 }

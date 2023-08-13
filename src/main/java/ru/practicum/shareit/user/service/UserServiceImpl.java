@@ -20,9 +20,9 @@ public class UserServiceImpl implements UserService {
     private final UserConverter userConverter;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserConverter userConverter) {
         this.userRepository = userRepository;
-        this.userConverter = new UserConverter();
+        this.userConverter = userConverter;
     }
 
     @Override

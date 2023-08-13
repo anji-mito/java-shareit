@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingCreationDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingConverter;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
@@ -25,12 +26,12 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final ItemRepository itemRepository;
 
-    public BookingServiceImpl(UserService userService,
-            BookingRepository bookingRepository, ItemRepository itemRepository) {
+    public BookingServiceImpl(UserService userService, UserConverter userConverter,
+            BookingConverter bookingConverter, BookingRepository bookingRepository, ItemRepository itemRepository) {
+        this.userConverter = userConverter;
+        this.bookingConverter = bookingConverter;
         this.itemRepository = itemRepository;
         this.userService = userService;
-        this.userConverter = new UserConverter();
-        this.bookingConverter = new BookingConverter();
         this.bookingRepository = bookingRepository;
     }
 
@@ -38,11 +39,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto add(BookingCreationDto bookingDto, long userId) {
         var booker = userConverter.convertToEntity(userService.getById(userId));
-        var itemOpt = itemRepository.findById(bookingDto.getItemId());
-        if (itemOpt.isEmpty()) {
-            throw new NotFoundException("Item with id " + bookingDto.getItemId() + " does not exist");
-        }
-        var item = itemOpt.get();
+        var item = itemRepository.findById(bookingDto.getItemId())
+                .orElseThrow(() -> new NotFoundException("Item with id " + bookingDto.getItemId() + " does not exist"));
         if (item.getOwner().getId() == userId) {
             throw new NotFoundException("Нельзя забронировать вещь у себя");
         }
@@ -57,40 +55,34 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto approveBooking(boolean isApproved, long bookingId, long userId) {
         userService.getById(userId);
-        var booking = bookingRepository.findById(bookingId);
-        if (booking.isPresent()) {
-            if (booking.get().getItem().getOwner().getId() == userId) {
-                if (isApproved) {
-                    if (booking.get().getStatus() == Status.APPROVED) {
-                        throw new BadRequestException("Бронирование уже подтверждено");
-                    }
-                    if (!booking.get().getItem().getAvailable()) {
-                        throw new BadRequestException("Предмет уже занят");
-                    }
-                    booking.get().setStatus(Status.APPROVED);
-                    return bookingConverter.convertToDto(booking.get());
-                }
-                booking.get().setStatus(Status.REJECTED);
-                return bookingConverter.convertToDto(booking.get());
-            } else {
-                throw new NotFoundException("Booking with id " + bookingId + " does not belong to this user");
-            }
-        } else {
-            throw new NotFoundException("Booking with id " + bookingId + " does not exist");
+        Booking booking = bookingRepository
+                .findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking with id " + bookingId + " does not exist"));
+        if (booking.getItem().getOwner().getId() != userId) {
+            throw new NotFoundException("Booking with id " + bookingId + " does not belong to this user");
         }
+        if (isApproved) {
+            if (booking.getStatus() == Status.APPROVED) {
+                throw new BadRequestException("Бронирование уже подтверждено");
+            }
+            if (!booking.getItem().getAvailable()) {
+                throw new BadRequestException("Предмет уже занят");
+            }
+            booking.setStatus(Status.APPROVED);
+            return bookingConverter.convertToDto(booking);
+        }
+        booking.setStatus(Status.REJECTED);
+        return bookingConverter.convertToDto(booking);
     }
 
     @Override
     public BookingDto getById(long id, long userId) {
-        var booking = bookingRepository.findById(id);
-        if (booking.isPresent()) {
-            if (booking.get().getItem().getOwner().getId() == userId || booking.get().getBooker().getId() == userId) {
-                return bookingConverter.convertToDto(booking.get());
-            } else {
-                throw new NotFoundException("This booking does not belong to user " + userId);
-            }
+        var booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Booking with id: " + id + " does not exist"));
+        if (booking.getItem().getOwner().getId() == userId || booking.getBooker().getId() == userId) {
+            return bookingConverter.convertToDto(booking);
         } else {
-            throw new NotFoundException("Booking with id: " + id + " does not exist");
+            throw new NotFoundException("This booking does not belong to user " + userId);
         }
     }
 
