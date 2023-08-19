@@ -26,13 +26,6 @@ public class BookingConverter {
         return bookingDto;
     }
 
-    public Booking convertToEntity(BookingDto bookingDto) {
-        Booking booking = modelMapper.map(bookingDto, Booking.class);
-        booking.setBooker(modelMapper.map(bookingDto.getBooker(), User.class));
-        booking.setItem(modelMapper.map(bookingDto.getItem(), Item.class));
-        return booking;
-    }
-
     public Booking convertToEntity(BookingCreationDto bookingCreationDto, User booker, Item item) {
         Booking booking = new Booking();
         booking.setBooker(booker);
