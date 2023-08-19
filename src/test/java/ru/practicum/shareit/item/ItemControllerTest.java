@@ -34,6 +34,8 @@ class ItemControllerTest {
     private ItemService itemService;
     private MockMvc mockMvc;
     private ObjectMapper objectMapper;
+    private ItemDto item;
+    private CommentDto comment;
 
     @BeforeEach
     public void setup() {
@@ -53,9 +55,6 @@ class ItemControllerTest {
                 .text("Инструмент спас мне жизнь")
                 .build();
     }
-
-    private ItemDto item;
-    private CommentDto comment;
 
     @Test
     void getAllByUser_success() throws Exception {
@@ -162,6 +161,7 @@ class ItemControllerTest {
 
         verify(itemService, times(1)).addComment(any(CommentDto.class), eq(1L), eq(1L));
     }
+
     @Test
     void getById_failure() throws Exception {
         when(itemService.getById(anyLong(), anyLong()))
@@ -173,9 +173,10 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.error").value("Not found item by id: " + 1L));
         verify(itemService, times(1)).getById(1L, 1L);
     }
+
     @Test
     void create_failure_invalidRequestBody() throws Exception {
-        ItemDto invalidItem = new ItemDto(); // Invalid request body with mandatory fields missing.
+        ItemDto invalidItem = new ItemDto();
 
         mockMvc.perform(post("/items")
                         .header("X-Sharer-User-Id", "1")
