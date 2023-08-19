@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.CommentConverter;
 import ru.practicum.shareit.item.mapper.ItemConverter;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
@@ -42,6 +43,8 @@ public class ItemServiceTest {
 
     @Mock
     private CommentRepository commentRepository;
+    @Mock
+    private CommentConverter commentConverter;
 
     @InjectMocks
     private ItemServiceImpl itemService;
@@ -49,8 +52,6 @@ public class ItemServiceTest {
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        itemService = new ItemServiceImpl(itemConverter, userService, userConverter, itemRepository,
-                bookingRepository, commentRepository);
     }
 
     @Test
@@ -180,5 +181,4 @@ public class ItemServiceTest {
         assertNotNull(searchResults);
         assertEquals(1, searchResults.size());
     }
-
 }
