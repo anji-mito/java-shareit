@@ -34,14 +34,12 @@ class RequestServiceImplTest {
     @Mock
     private ItemRequestConverter itemRequestConverter;
 
-    private final LocalDateTime now = LocalDateTime.now();
     private final User user = new User();
     private final ItemRequest itemRequest = new ItemRequest();
     private final ItemRequestDto itemRequestDto = new ItemRequestDto();
 
     @Test
     void add_success() {
-        // Arrange
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(user));
         when(itemRequestConverter.convertToEntity(eq(itemRequestDto), eq(user))).thenReturn(itemRequest);
         when(requestRepository.save(itemRequest)).thenReturn(itemRequest);
