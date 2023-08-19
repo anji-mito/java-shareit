@@ -95,6 +95,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.name", is(updatedUserDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
     }
+
     @Test
     void getAll() throws Exception {
         when(userService.getAll()).thenReturn(List.of(userDto));

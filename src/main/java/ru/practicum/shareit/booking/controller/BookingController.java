@@ -44,7 +44,7 @@ public class BookingController {
             @RequestParam(required = false, defaultValue = "ALL") String state,
             @RequestParam(required = false, defaultValue = "0") @NotNull @Min(0) Integer from,
             @RequestParam(required = false, defaultValue = "10") @NotNull @Min(1) Integer size) {
-        return bookingService.getAllByBooker(userId, state, from /size, size);
+        return bookingService.getAllByBooker(userId, state, from / size, size);
     }
 
     @GetMapping("/owner")

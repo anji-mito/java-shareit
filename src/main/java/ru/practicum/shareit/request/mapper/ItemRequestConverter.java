@@ -13,6 +13,7 @@ public class ItemRequestConverter {
     public ItemRequestConverter(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
+
     public ItemRequestDto convertToDto(ItemRequest itemRequest) {
         return modelMapper.map(itemRequest, ItemRequestDto.class);
     }
