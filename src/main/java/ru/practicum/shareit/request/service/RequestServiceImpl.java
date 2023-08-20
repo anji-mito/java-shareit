@@ -36,10 +36,12 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public ItemRequestDto getById(long id, long userId) {
-        User user = getUserById(userId);
-        return itemRequestConverter.convertToDto(requestRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("Request with id: " + id + " does not exist")));
+    public ItemRequestDto getById(long requestId, long userId) {
+        getUserById(userId);
+        return requestRepository
+                .findById(requestId)
+                .map(itemRequestConverter::convertToDto)
+                .orElseThrow(() -> new NotFoundException("Request with id: " + requestId + " does not exist"));
     }
 
     @Override
