@@ -3,6 +3,8 @@ package ru.practicum.shareit.item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.mapper.ItemConverter;
@@ -10,6 +12,7 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,5 +68,27 @@ public class ItemConverterTest {
         assertEquals(itemDto.getName(), item.getName());
         assertEquals(itemDto.getDescription(), item.getDescription());
         assertEquals(itemDto.getAvailable(), item.getAvailable());
+    }
+    @Test
+    public void convertToDtoWithBookings_validRequest_success() {
+        User owner = new User();
+        Item item = new Item(1L, "Test Item", "Test Description", true, owner,
+                null, null, null);
+        item.setBookings(List.of(Booking.builder()
+                .id(1L)
+                .item(item)
+                .end(LocalDateTime.now())
+                .start(LocalDateTime.now().plusDays(1))
+                .booker(owner)
+                .status(Status.APPROVED)
+                .build()));
+        item.setComments(List.of());
+        ItemDto itemDto = itemConverter.convertToDtoWithBookings(item);
+
+        assertNotNull(itemDto);
+        assertEquals(itemDto.getName(), item.getName());
+        assertEquals(itemDto.getDescription(), item.getDescription());
+        assertEquals(itemDto.getAvailable(), item.getAvailable());
+        assertNotNull(itemDto.getComments());
     }
 }
