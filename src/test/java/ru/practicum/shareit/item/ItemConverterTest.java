@@ -69,6 +69,7 @@ public class ItemConverterTest {
         assertEquals(itemDto.getDescription(), item.getDescription());
         assertEquals(itemDto.getAvailable(), item.getAvailable());
     }
+
     @Test
     public void convertToDtoWithBookings_validRequest_success() {
         User owner = new User();
