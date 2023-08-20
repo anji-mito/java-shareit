@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingCreationDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
@@ -90,37 +91,38 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDto> getAllByBooker(long userId, String state, int from, int size) {
         userService.getById(userId);
+        Pageable pageable = PageRequest.of(from, size);
         switch (state) {
             case "ALL":
-                return bookingRepository.findAllByBookerIdOrderByStartDesc(userId, PageRequest.of(from, size)).stream()
+                return bookingRepository.findAllByBookerIdOrderByStartDesc(userId, pageable).stream()
                     .map(bookingConverter::convertToDto)
                     .collect(Collectors.toUnmodifiableList());
             case "CURRENT":
                 return bookingRepository.findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(userId,
-                                LocalDateTime.now(), LocalDateTime.now(), PageRequest.of(from, size)).stream()
+                                LocalDateTime.now(), LocalDateTime.now(), pageable).stream()
                         .map(bookingConverter::convertToDto)
                         .collect(Collectors.toUnmodifiableList());
             case "PAST":
                 return bookingRepository.findAllByBookerIdAndEndIsBeforeOrderByStartDesc(userId, LocalDateTime.now(),
-                                PageRequest.of(from, size))
+                                pageable)
                         .stream()
                         .map(bookingConverter::convertToDto)
                         .collect(Collectors.toUnmodifiableList());
             case "FUTURE":
                 return bookingRepository.findAllByBookerIdAndStartIsAfterOrderByStartDesc(userId, LocalDateTime.now(),
-                                PageRequest.of(from, size))
+                                pageable)
                         .stream()
                         .map(bookingConverter::convertToDto)
                         .collect(Collectors.toUnmodifiableList());
             case "WAITING":
                 return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.WAITING,
-                                PageRequest.of(from, size))
+                                pageable)
                         .stream()
                         .map(bookingConverter::convertToDto)
                         .collect(Collectors.toUnmodifiableList());
             case "REJECTED":
                 return bookingRepository.findAllByBookerIdAndStatusOrderByStartDesc(userId, Status.REJECTED,
-                                PageRequest.of(from, size))
+                                pageable)
                         .stream()
                         .map(bookingConverter::convertToDto)
                         .collect(Collectors.toUnmodifiableList());

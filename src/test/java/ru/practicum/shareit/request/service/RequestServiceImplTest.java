@@ -6,6 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestConverter;
@@ -116,7 +117,7 @@ class RequestServiceImplTest {
         assertEquals(itemRequestDto, result.get(0));
 
         verify(userRepository, times(1)).findById(1L);
-        verify(requestRepository, times(1)).findAllByRequesterIdOrderByCreatedDesc(1L, PageRequest.of(0, 5));
+        verify(requestRepository, times(1)).findAllByRequesterIdOrderByCreatedDesc(1L,  PageRequest.of(0, 5));
         verify(itemRequestConverter, times(1)).convertToDto(itemRequest);
     }
 

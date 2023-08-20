@@ -12,24 +12,24 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByBookerIdOrderByStartDesc(long userId, Pageable pageRequest);
 
     List<Booking> findAllByBookerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(long userId, LocalDateTime start,
-            LocalDateTime end, Pageable pageRequest);
+            LocalDateTime end, Pageable pageable);
 
-    List<Booking> findAllByBookerIdAndEndIsBeforeOrderByStartDesc(long userId, LocalDateTime end, Pageable pageRequest);
+    List<Booking> findAllByBookerIdAndEndIsBeforeOrderByStartDesc(long userId, LocalDateTime end, Pageable pageable);
 
-    List<Booking> findAllByBookerIdAndStartIsAfterOrderByStartDesc(long userId, LocalDateTime start, Pageable pageRequest);
+    List<Booking> findAllByBookerIdAndStartIsAfterOrderByStartDesc(long userId, LocalDateTime start, Pageable pageable);
 
-    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(long userId, Status status, Pageable pageRequest);
+    List<Booking> findAllByBookerIdAndStatusOrderByStartDesc(long userId, Status status, Pageable pageable);
 
     List<Booking> findAllByItemOwnerIdOrderByStartDesc(long userId, Pageable pageRequest);
 
     List<Booking> findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfterOrderByStartDesc(long userId, LocalDateTime start,
-            LocalDateTime end, Pageable pageRequest);
+            LocalDateTime end, Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdAndEndIsBeforeOrderByStartDesc(long userId, LocalDateTime end, Pageable pageRequest);
+    List<Booking> findAllByItemOwnerIdAndEndIsBeforeOrderByStartDesc(long userId, LocalDateTime end, Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdAndStartIsAfterOrderByStartDesc(long userId, LocalDateTime start, Pageable pageRequest);
+    List<Booking> findAllByItemOwnerIdAndStartIsAfterOrderByStartDesc(long userId, LocalDateTime start, Pageable pageable);
 
-    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long userId, Status status, Pageable pageRequest);
+    List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long userId, Status status, Pageable pageable);
 
     List<Booking> findAllByBookerIdAndStatusAndEndIsBeforeOrderByStartDesc(long userId, Status approved,
             LocalDateTime now);
