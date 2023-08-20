@@ -9,10 +9,8 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @AllArgsConstructor
-@Builder
 @Data
 @NoArgsConstructor
 @Entity
@@ -33,30 +31,4 @@ public class Booking {
     private User booker;
     @Enumerated(EnumType.STRING)
     private Status status;
-
-    @Override
-    public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
-        result = 31 * result + (start != null ? start.hashCode() : 0);
-        result = 31 * result + (end != null ? end.hashCode() : 0);
-        result = 31 * result + (item != null ? item.hashCode() : 0);
-        result = 31 * result + (booker != null ? booker.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Booking booking = (Booking) o;
-
-        if (id != booking.id) return false;
-        if (!Objects.equals(start, booking.start)) return false;
-        if (!Objects.equals(end, booking.end)) return false;
-        if (!Objects.equals(item, booking.item)) return false;
-        if (!Objects.equals(booker, booking.booker)) return false;
-        return status == booking.status;
-    }
 }

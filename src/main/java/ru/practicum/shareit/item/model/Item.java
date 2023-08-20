@@ -25,17 +25,18 @@ public class Item {
     private long id;
     private String name;
     private String description;
+    @Column(name = "available")
     private Boolean available;
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "user_id", nullable = false)
     private User owner;
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
     @Fetch(value = FetchMode.SUBSELECT)
     private Collection<Booking> bookings = new ArrayList<>();
-    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "item", fetch = FetchType.EAGER)
     @Fetch(value = FetchMode.SUBSELECT)
     private Collection<Comment> comments = new ArrayList<>();
-    @OneToOne
+    @OneToOne()
     @JoinColumn(name = "requester_id")
     private ItemRequest request;
 

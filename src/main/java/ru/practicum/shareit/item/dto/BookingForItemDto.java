@@ -1,14 +1,11 @@
 package ru.practicum.shareit.item.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
+@AllArgsConstructor
 public class BookingForItemDto {
     long id;
     long bookerId;
-
-    public BookingForItemDto(long id, long bookerId) {
-        this.id = id;
-        this.bookerId = bookerId;
-    }
 }
