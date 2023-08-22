@@ -20,7 +20,6 @@ public class ItemConverter {
     private final ModelMapper modelMapper;
 
     public ItemConverter(ModelMapper modelMapper) {
-
         this.modelMapper = modelMapper;
     }
 
