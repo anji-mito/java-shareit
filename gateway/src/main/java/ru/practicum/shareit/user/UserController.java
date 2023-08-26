@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -21,6 +20,7 @@ import java.util.List;
 @Validated
 public class UserController {
     private final UserClient userClient;
+
     @ResponseBody
     @PostMapping
     public ResponseEntity<Object> create(@Valid @RequestBody UserDto userDto) {
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object>  getUser(@PathVariable long id) {
+    public ResponseEntity<Object> getUser(@PathVariable long id) {
         return userClient.findById(id);
     }
 
