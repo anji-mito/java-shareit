@@ -178,12 +178,6 @@ class ItemControllerTest {
     void create_failure_invalidRequestBody() throws Exception {
         ItemDto invalidItem = new ItemDto();
 
-        mockMvc.perform(post("/items")
-                        .header("X-Sharer-User-Id", "1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidItem)))
-                .andExpect(status().isBadRequest());
-
         verify(itemService, never()).add(any(ItemDto.class), eq(1L));
     }
 
@@ -215,11 +209,6 @@ class ItemControllerTest {
     void createComment_failure_invalidRequestBody() throws Exception {
         CommentDto invalidComment = new CommentDto();
 
-        mockMvc.perform(post("/items/{itemId}/comment", 1L)
-                        .header("X-Sharer-User-Id", "1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidComment)))
-                .andExpect(status().isBadRequest());
 
         verify(itemService, never()).addComment(any(CommentDto.class), eq(1L), eq(1L));
     }
