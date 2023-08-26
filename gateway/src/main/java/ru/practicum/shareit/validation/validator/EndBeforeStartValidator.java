@@ -5,6 +5,7 @@ import ru.practicum.shareit.validation.annotation.EndBeforeStart;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
+import java.time.LocalDateTime;
 
 public class EndBeforeStartValidator implements ConstraintValidator<EndBeforeStart, BookingCreationDto> {
     @Override
@@ -16,6 +17,10 @@ public class EndBeforeStartValidator implements ConstraintValidator<EndBeforeSta
         if (bookingCreationDto.getEnd().isBefore(bookingCreationDto.getStart())) {
             return false;
         }
+        if (bookingCreationDto.getStart().isBefore(LocalDateTime.now()))
+            return false;
+        if (bookingCreationDto.getEnd().isBefore(LocalDateTime.now()))
+            return false;
         return !bookingCreationDto.getEnd().equals(bookingCreationDto.getStart());
     }
 }
